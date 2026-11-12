@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TAREZZZ ADMIN</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#090909;color:#fff;font-family:Arial,sans-serif;padding:20px}
+.wrap{max-width:850px;margin:35px auto}
+h1{font-size:30px} .red{color:#ed263d}
+.card{background:#151515;border:1px solid #292929;border-radius:14px;padding:20px;margin:15px 0}
+input,textarea,select{width:100%;padding:13px;margin:7px 0 14px;background:#090909;border:1px solid #383838;border-radius:8px;color:white;font-size:15px}
+textarea{min-height:90px;resize:vertical}
+button{background:#e3293d;color:white;border:0;border-radius:8px;padding:12px 17px;font-weight:bold;cursor:pointer;margin:5px 5px 5px 0}
+button.secondary{background:#333}
+button.delete{background:#70202a}
+small{color:#aaa}
+.hidden{display:none}
+.item{border-top:1px solid #333;padding-top:15px;margin-top:15px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>TAREZZZ <span class="red">ADMIN</span></h1>
+
+  <section id="login" class="card">
+    <h2>Вхід адміністратора</h2>
+    <input id="password" type="password" placeholder="Пароль адміністратора">
+    <button id="loginBtn">УВІЙТИ</button>
+    <p id="loginMsg"></p>
+  </section>
+
+  <section id="panel" class="hidden">
+    <div class="card">
+      <h2>Керування <span class="red">сайтом</span></h2>
+      <button class="secondary" id="logoutBtn">ВИЙТИ</button>
+      <button id="saveBtn">ЗБЕРЕГТИ ВСЕ</button>
+      <p id="status"><small>Дані ще не завантажені</small></p>
+    </div>
+
+    <div class="card">
+      <h2>НОВИНА</h2>
+      <input id="newsTitle" placeholder="Заголовок новини">
+      <input id="newsCategory" placeholder="Категорія, наприклад MATCH NEWS">
+      <textarea id="newsText" placeholder="Текст новини"></textarea>
+      <input id="newsDate" placeholder="Дата, наприклад 13.11.2026">
+      <button id="addNews">ДОДАТИ НОВИНУ</button>
+      <div id="newsList"></div>
+    </div>
+
+    <div class="card">
+      <h2>МАТЧ</h2>
+      <input id="matchOpponent" placeholder="Назва суперника">
+      <input id="matchDate" placeholder="Дата матчу">
+      <input id="matchScore" placeholder="Рахунок, наприклад 2:0">
+      <input id="matchTournament" placeholder="Назва турніру">
+      <select id="matchStatus">
+        <option value="UPCOMING">Майбутній матч</option>
+        <option value="WIN">Перемога</option>
+        <option value="LOSS">Поразка</option>
+        <option value="DRAW">Нічия</option>
+      </select>
+      <button id="addMatch">ДОДАТИ МАТЧ</button>
+      <div id="matchList"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const endpoint = "/.netlify/functions/admin-data";
+let content = {news:[],matches:[]};
+
+const $ = id => document.getElementById(id);
+const status = message => $("status").textContent = message;
+
+async function request(body) {
+  const res = await fetch(endpoint, {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Помилка");
+  return data;
+}
+
+function showPanel() {
+  $("login").classList.add("hidden");
+  $("panel").classList.remove("hidden");
+}
+
+function render() {
+  $("newsList").replaceChildren();
+  $("matchList").replaceChildren();
+
+  content.news.forEach((item,index) => {
+    const box = document.createElement("div");
+    box.className = "item";
+    box.innerHTML = `
+      <input placeholder="Заголовок">
+      <input placeholder="Категорія">
+      <textarea placeholder="Текст"></textarea>
+      <input placeholder="Дата">
+      <button class="delete">ВИДАЛИТИ</button>`;
+    const fields = box.querySelectorAll("input,textarea");
+    fields[0].value = item.title || "";
+    fields[1].value = item.category || "";
+    fields[2].value = item.text || "";
+    fields[3].value = item.date || "";
+    fields.forEach((field,i) => field.addEventListener("input", () => {
+      ["title","category","text","date"].forEach((key,j) => {
+        if(i === j) item[key] = field.value;
+      });
+    }));
+    box.querySelector("button").onclick = () => {
+      content.news.splice(index,1);
+      render();
+    };
+    $("newsList").append(box);
+  });
+
+  content.matches.forEach((item,index) => {
+    const box = document.createElement("div");
+    box.className = "item";
+    box.innerHTML = `
+      <input placeholder="Суперник">
+      <input placeholder="Дата">
+      <input placeholder="Рахунок">
+      <input placeholder="Турнір">
+      <select>
+        <option value="UPCOMING">Майбутній матч</option>
+        <option value="WIN">Перемога</option>
+        <option value="LOSS">Поразка</option>
+        <option value="DRAW">Нічия</option>
+      </select>
+      <button class="delete">ВИДАЛИТИ</button>`;
+    const fields = box.querySelectorAll("input,select");
+    const keys = ["opponent","date","score","tournament","status"];
+    fields.forEach((field,i) => {
+      field.value = item[keys[i]] || "";
+      field.addEventListener("input", () => item[keys[i]] = field.value);
+      field.addEventListener("change", () => item[keys[i]] = field.value);
+    });
+    box.querySelector("button").onclick = () => {
+      content.matches.splice(index,1);
+      render();
+    };
+    $("matchList").append(box);
+  });
+}
+
+$("loginBtn").onclick = async () => {
+  $("loginMsg").textContent = "Перевіряємо...";
+  try {
+    await request({action:"login",password:$("password").value});
+    $("password").value = "";
+    showPanel();
+    const res = await fetch(endpoint,{credentials:"same-origin"});
+    if(!res.ok) throw new Error("Не вдалося завантажити дані");
+    content = await res.json();
+    render();
+    status("Дані завантажено");
+  } catch(error) {
+    $("loginMsg").textContent = error.message;
+  }
+};
+
+$("addNews").onclick = () => {
+  if(!$("newsTitle").value.trim()) return alert("Введи заголовок");
+  content.news.push({
+    id:crypto.randomUUID(),
+    title:$("newsTitle").value,
+    category:$("newsCategory").value,
+    text:$("newsText").value,
+    date:$("newsDate").value
+  });
+  ["newsTitle","newsCategory","newsText","newsDate"].forEach(id => $(id).value="");
+  render();
+};
+
+$("addMatch").onclick = () => {
+  if(!$("matchOpponent").value.trim()) return alert("Введи суперника");
+  content.matches.push({
+    id:crypto.randomUUID(),
+    opponent:$("matchOpponent").value,
+    date:$("matchDate").value,
+    score:$("matchScore").value,
+    tournament:$("matchTournament").value,
+    status:$("matchStatus").value
+  });
+  ["matchOpponent","matchDate","matchScore","matchTournament"].forEach(id => $(id).value="");
+  render();
+};
+
+$("saveBtn").onclick = async () => {
+  try {
+    status("Зберігаємо...");
+    await request({action:"save",content});
+    status("Збережено успішно!");
+  } catch(error) {
+    status("Помилка: " + error.message);
+  }
+};
+
+$("logoutBtn").onclick = async () => {
+  try {
+    await request({action:"logout"});
+  } finally {
+    $("panel").classList.add("hidden");
+    $("login").classList.remove("hidden");
+    $("loginMsg").textContent = "Ви вийшли з адмінки";
+  }
+};
+</script>
+</body>
+</html>

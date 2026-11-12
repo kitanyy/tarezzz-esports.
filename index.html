@@ -83,4 +83,76 @@ document.getElementById('joinForm').addEventListener('submit',async e=>{
  finally{button.disabled=false;button.textContent='ПІДГОТУВАТИ ЗАЯВКУ';}
 });
 </script>
+ 
+<style>
+.matches-section {
+  padding: 35px 15px;
+  text-align: center;
+}
+.matches-section h2 {
+  font-size: 28px;
+  margin-bottom: 25px;
+}
+.match-card {
+  max-width: 550px;
+  margin: 15px auto;
+  padding: 22px;
+  border: 1px solid #444;
+  border-radius: 16px;
+  background: #171717;
+}
+.match-date {
+  color: #aaa;
+  font-size: 14px;
+}
+.match-teams {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+  font-weight: bold;
+}
+.match-score {
+  font-size: 34px;
+  font-weight: 900;
+  margin: 12px;
+}
+.match-status {
+  color: #ff5555;
+  font-weight: bold;
+}
+.match-upcoming {
+  color: #55baff;
+  font-weight: bold;
+}
+</style>
+
+<section class="matches-section">
+  <h2>🏆 МАТЧІ КОМАНДИ</h2>
+
+  <div class="match-card">
+    <div class="match-date">7 листопада 2026</div>
+    <div class="match-teams">
+      <span>TAREZZZ ESPORTS</span>
+      <span>ZITRO ESPORTS</span>
+    </div>
+    <div class="match-score">0 : 2</div>
+    <div>Рахунок за сетами</div>
+    <p class="match-status">ПОРАЗКА</p>
+    <small>Матч завершено</small>
+  </div>
+
+  <div class="match-card">
+    <div class="match-date">21 листопада 2026</div>
+    <div class="match-teams">
+      <span>TAREZZZ ESPORTS</span>
+      <span>Суперник</span>
+    </div>
+    <div class="match-score">VS</div>
+    <div>Турнірний матч</div>
+    <p class="match-upcoming">ОЧІКУЄТЬСЯ</p>
+    <small>Суперник уточнюється</small>
+  </div>
+</section>
 </body></html>

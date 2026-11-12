@@ -36,6 +36,63 @@ h1{font-size:clamp(42px,8vw,82px);line-height:.95;letter-spacing:-3px;margin:0;f
 form{display:grid;gap:13px;max-width:620px}.field{display:grid;gap:7px}.field label{font-size:11px;color:#c4c4cc;font-weight:800;letter-spacing:1px}.field input,.field textarea,.field select{width:100%;background:#111116;border:1px solid #34343e;border-radius:7px;padding:13px;color:white;font:inherit;outline:none}.field input:focus,.field textarea:focus{border-color:var(--red)}.field textarea{min-height:100px;resize:vertical}.note{font-size:11px;color:var(--muted);line-height:1.6}
 footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-size:11px}.foot{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}.red{color:var(--red2)}
 @media(max-width:700px){.nav{height:64px}nav{display:none;position:absolute;top:64px;left:0;right:0;background:#0d0d12;border-bottom:1px solid var(--line);padding:18px 4%;flex-direction:column;gap:17px}nav.open{display:flex}.menu{display:block}.hero{padding:68px 0 48px}.stats{gap:8px}.stat{padding:14px 8px}.stat strong{font-size:23px}.stat span{font-size:9px;letter-spacing:1px}.grid{grid-template-columns:1fr}.section-head{align-items:start;flex-direction:column}.callout{align-items:start;flex-direction:column}.page-title{padding-top:42px}}
+  
+/* TAREZZZ ESPORTS ANIMATIONS */
+
+.page.active {
+  animation: pageIn .45s ease both;
+}
+
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card, .stat {
+  transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+.card:hover, .stat:hover {
+  transform: translateY(-6px);
+  border-color: #e3293d;
+  box-shadow: 0 8px 25px #e3293d22;
+}
+
+.btn {
+  transition: transform .2s ease, filter .2s ease, box-shadow .2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 5px 20px #e3293d55;
+}
+
+.mini, .crest {
+  animation: logoFloat 4s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
 </style>
 </head>
 <body>
